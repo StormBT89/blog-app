@@ -28,7 +28,7 @@ export default function Header() {
             <FaMoon/>
         </Button>
         <Link>
-            <Button >
+            <Button outline>
                 Најави се
             </Button>
         </Link>   
