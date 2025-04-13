@@ -54,7 +54,7 @@ export default function SignUp() {
         </Link> 
         <p className="text-sm mt-5 font-medium">
         Регистрирајте се во системот за состаноци, дел од дигиталната платформа  
-         StormIt
+         StormIt Solutions
         </p>
         </div>   
         {/* right */}
