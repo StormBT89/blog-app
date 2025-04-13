@@ -36,9 +36,9 @@ export default function Header() {
       </div>
       <NavbarCollapse>
             <NavbarLink active={path === '/'}>
-                <Link to={'/'}>
-                    Почетна
-                </Link>                
+            <Link to={'/'}>
+                Почетна
+            </Link>                
             </NavbarLink>
             <NavbarLink active={path === '/about'}>
                 <Link to={'/about'}>
