@@ -15,6 +15,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    profilePicture: {
+        type: String,
+        default: 'https://www.usnews.com/object/image/0000015c-a2ce-da40-adfe-a3ef706c0000/180417smallbeachtowns-stock.jpg?update-time=1524001273952&size=responsive970'
+    }
 }, {timestamps: true});
 
 const User = mongoose.model('User', userSchema);
