@@ -43,7 +43,7 @@ export default function SignUp() {
   }
 
   return (
-    <div className="min-h-screen mt-20">
+    <div className="min-h-screen mt-10">
       <div className="flex p-3 mx-auto max-w-3xl flex-col md:flex-row md:items-center gap-5">
         {/* left */}    
         <div className="flex-2">
@@ -77,7 +77,7 @@ export default function SignUp() {
             <div>
               <FloatingLabel variant="filled" label="Пасворд" disabled={true}/>
               <TextInput type="password"
-                         placeholder=""
+                         placeholder="******"
                          id='password'
                          onChange={handleChange}/>              
             </div>
@@ -101,7 +101,7 @@ export default function SignUp() {
             </Link>
           </div>
           {errorMessage && (
-            <Alert className='mt-5' color="failure">
+            <Alert className="mt-5" color="failure">
               {errorMessage}
             </Alert>
           )}
