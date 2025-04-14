@@ -9,7 +9,7 @@ export default function Header() {
     const path = useLocation().pathname;   
     const dispatch = useDispatch(); 
     const { currentUser } = useSelector((state) => state.user);
-    const { theme } = useSelector((state) => state.theme);
+    const { lux } = useSelector((state) => state.theme);
     
   return (
    <Navbar className='border-b-2'>
@@ -31,7 +31,7 @@ export default function Header() {
       </Button>      
       <div className='flex gap-2 md:order-2'>
         <Button className='w-12 h-10 hidden sm:inline' color='gray' pill onClick={() => dispatch(toogleTheme())}>
-            {theme === 'light' ? <FaMoon/>  : <FaSun/>}          
+            {lux === 'light' ? <FaMoon/>  : <FaSun/>}          
         </Button> 
         {
             currentUser ? (                
