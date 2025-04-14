@@ -16,7 +16,7 @@ export default function OAuth() {
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt: 'select_account'});
     try {
-      const resultsFromGoogle = await signInWithPopup(auth, provider);
+      const resultsFromGoogle = await signInWithPopup(auth, provider);      
       const res = await fetch('/api/auth/google',{
         method: 'POST',
         headers: { 'Content-Type': 'application/json'},
@@ -26,7 +26,8 @@ export default function OAuth() {
           googlePhotoUrl: resultsFromGoogle.user.photoURL,
         }),
       });
-      const data = res.json();     
+      const data = await res.json();   
+      
       if (res.ok) {
         dispatch(signInSuccess(data));
         navigate('/');
@@ -38,7 +39,7 @@ export default function OAuth() {
   return (
    <Button onClick={handleGoogleClick} type="button" className='bg-gradient-to-br from-pink-600 to-orange-500
    text-white hover:bg-gradient-to-bl focus:ring-pink-200 dark:focus:ring-pink-800'>
-        Најави се со -- <AiFillGoogleCircle/> -- Google       
+        Пристапи со -- <AiFillGoogleCircle/> -- Google       
    </Button>
   )
 }

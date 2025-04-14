@@ -85,10 +85,11 @@ export const google = async (req, res, next) => {
                 email,
                 password: hashedPassword,
                 profilePicture: googlePhotoUrl,
-            });
+            });            
             await newUser.save();
             const token = jwt.sign({ id: newUser._id}, process.env.JWT_SECRET);
             const { password, ...rest } = newUser._doc;
+            console.log(rest);
             res
             .status(200)
             .cookie('access_token', token, {httpOnly: true,})
