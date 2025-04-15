@@ -27,7 +27,7 @@ export default function DashSidebar() {
               Корисник
             </SidebarItem>
           </Link>
-          <SidebarItem icon={HiArrowRight} className='cursor-pointer' >
+          <SidebarItem icon={HiArrowRight} className='cursor-pointer'>
             Одјави се
           </SidebarItem>
         </SidebarItemGroup>
