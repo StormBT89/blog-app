@@ -23,7 +23,7 @@ export default function DashSidebar() {
       <SidebarItems>
         <SidebarItemGroup>
           <Link to={'/dashboard?tab=profile'}>
-            <SidebarItem active={tab === 'profile'} icon={HiUser} label={'Име на корисник'} labelColor='dark' >
+            <SidebarItem active={tab === 'profile'} icon={HiUser} label={'Име на корисник'} labelColor='dark' as='button' >
               Корисник
             </SidebarItem>
           </Link>

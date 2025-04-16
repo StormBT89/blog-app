@@ -68,17 +68,17 @@ export default function Header() {
         <NavbarToggle/>   
       </div>
       <NavbarCollapse>
-            <NavbarLink active={path === '/'}>
+            <NavbarLink active={path === '/'} as={'div'}>
             <Link to={'/'}>
                 Почетна
             </Link>                
             </NavbarLink>
-            <NavbarLink active={path === '/about'}>
+            <NavbarLink active={path === '/about'} as={'div'}>
                 <Link to={'/about'}>
                     Контакт
                 </Link>                
             </NavbarLink>
-            <NavbarLink active={path === '/projects'}>
+            <NavbarLink active={path === '/projects'} as={'div'}>
                 <Link to={'/projects'}>
                     Проекти
                 </Link>                
