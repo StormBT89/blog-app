@@ -32,11 +32,9 @@ export default function DashSidebar() {
           dispatch(signoutSuccess());
         }
       } catch (error) {
-        console.log(error.message);
-        
+        console.log(error.message);        
       }
     }
-
 
   return (
    <Sidebar className='w-full md:w-56'>
