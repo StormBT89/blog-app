@@ -8,10 +8,11 @@ import 'react-circular-progressbar/dist/styles.css';
 import { updateStart, updateSuccess, updateFailure, deleteUserStart, deleteUserSuccess, deleteUserFailure, signoutSuccess } from '../redux/user/userSlice'
 import { useDispatch } from 'react-redux'
 import { HiOutlineExclamationCircle } from 'react-icons/hi'
+import { Link } from 'react-router-dom'
 
 export default function DashProfile() {
 
-  const {currentUser, error} = useSelector((state) => state.user);
+  const {currentUser, error, loading} = useSelector((state) => state.user);
   const [imageFile, setImageFile] = useState(null);
   const [imageFileUrl, setImageFileUrl] = useState(null);
   const [imageFileUploadProgress, setImageFileUploadProgress] = useState(null);
@@ -200,9 +201,22 @@ export default function DashProfile() {
               <TextInput onChange={handleChange} type='text' id='username' placeholder='Корисничко име' defaultValue={currentUser.username}/>
               <TextInput onChange={handleChange} type='email' id='email' placeholder='Е-маил' defaultValue={currentUser.email}/>
               <TextInput onChange={handleChange} type='password' id='password' placeholder='*******'/>
-              <Button type='submit' className='bg-gradient-to-r from-white-200 via-gray-500 to-black-500'>
-                Ажурирај кориснички податоци
+              <Button type='submit' disabled={loading || imageFileUploading} className='bg-gradient-to-r from-white-200 via-gray-500 to-black-500'>
+                {
+                  loading ? 'Се вчитува..' : 'Ажурирај кориснички податоци'
+                }
               </Button>
+              {
+                currentUser.isAdmin && (
+                  <Link to={'/create-post'}>
+                  <Button type='button' className='w-full 
+                  bg-gradient-to-r from-white-200 via-gray-500 to-black-500'>
+                      Креирај состанок
+                  </Button>
+                </Link>
+                )
+              }
+             
         </form>
         <div className='text-red-500 flex justify-between mt-5'>
           <span onClick={()=> setShowModal(true)} className='cursor-pointer'>Избриши ја корисничката сметка</span>
