@@ -52,4 +52,19 @@ export const updateUser = async (req, res, next) => {
     }
 }
 
+export const deleteUser = async (req, res, next) => {
+    
+    if (req.user.id !== req.params.userId) {
+        return next(errorHandler(403, 'Немате привилегии да ја избришете корисничката сметка'));
+    }
+
+    try {
+        await User.findByIdAndDelete(req.params.userId);
+        res.status(200).json('Корисничката сметка е успешно избришана');
+        
+    } catch (error) {
+        next(error);
+    }
+}
+
        
