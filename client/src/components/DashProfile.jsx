@@ -5,7 +5,8 @@ import { getDownloadURL, getStorage, ref, uploadBytesResumable } from 'firebase/
 import { app } from '../firebase'
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
-
+import { updateStart, updateSuccess, updateFailure } from '../redux/user/userSlice'
+import { useDispatch } from 'react-redux'
 
 export default function DashProfile() {
 
@@ -14,16 +15,21 @@ export default function DashProfile() {
   const [imageFileUrl, setImageFileUrl] = useState(null);
   const [imageFileUploadProgress, setImageFileUploadProgress] = useState(null);
   const [imageFileUploadError, setImageFileUploadError] = useState(null);  
-  const filePickerRef = useRef();
+  const [imageFileUploading, setImageFileUploading] = useState(false);
+  const [updateUserSuccess, setUpdateUserSuccess] = useState(null);
+  const [updateUserError, setUpdateUserError] = useState(null);
 
+  const [formData, setFormData] = useState({});
+
+  const filePickerRef = useRef();
+  const dispatch = useDispatch();
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       setImageFile(file);
       setImageFileUrl(URL.createObjectURL(file));
-    }
-    
+    }    
   }
 
   useEffect(() => {
@@ -46,6 +52,7 @@ export default function DashProfile() {
   }
 }
       */
+    setImageFileUploading(true);
     setImageFileUploadError(null);
     const storage = getStorage(app);
     const fileName = new Date().getTime() + imageFile.name;
@@ -62,26 +69,75 @@ export default function DashProfile() {
         setImageFileUploadError(error);
         setImageFile(null);
         setImageFileUrl(null);
+        setImageFileUploading(false);
 
       }, 
       () => {
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          setImageFileUrl(downloadURL);          
+          setImageFileUrl(downloadURL);
+          setFormData({...formData, profilePicture: downloadURL});  
+          setImageFileUploading(false);    
         });
       }
       );    
   }
 
+  const handleChange = (e) => {
+    setFormData({...formData, [e.target.id]: e.target.value});
+  }
+    
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    setUpdateUserError(null);
+    setUpdateUserSuccess(null);
+  
+    if (Object.keys(formData).length === 0) {
+      setUpdateUserError('Не се направени промени во податоците');
+      return;
+    }
+
+    if(imageFileUploading) {
+      setUpdateUserError('Ве молиме почекајте.. Фотографијата се прикачува.')
+      return;
+    }
+
+    try {
+      dispatch(updateStart());
+      
+      const res = await fetch(`/api/user/update/${currentUser._id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });      
+      const data = await res.json();
+      
+      if (!res.ok) {
+        dispatch(updateFailure(data.message));
+        setUpdateUserError(data.message);
+      } else {
+        dispatch(updateSuccess(data));
+        setUpdateUserSuccess('Корисничката сметка е успешно ажурирана');
+      }
+      
+    } catch (error) {
+      dispatch(updateFailure(error.message));
+      setUpdateUserError(error.message);
+      
+    }
+  }
 
   return (
       <div className='max-w-lg mx-auto p-3 w-full'>
         <h1 className='my-7 text-center font-semibold text-3xl'>{currentUser.username}</h1>
-        <form className='flex flex-col gap-4'>
+        <form onSubmit={handleSubmit} className='flex flex-col gap-4'>
           <input type='file' accept='image/*' onChange={handleImageChange} ref={filePickerRef} hidden/>
           <div className=' relative w-32 h-32 self-center cursor-pointer shadow-md overflow-hidden rounded-full' 
               onClick={() => filePickerRef.current.click()}>
             {imageFileUploadProgress && (
-              <CircularProgressbar value={imageFileUploadProgress || 0} text={`${imageFileUploadProgress}`}
+              <CircularProgressbar value={imageFileUploadProgress || 0} text={`${imageFileUploadProgress}%`}
                                     strokeWidth={5}
                                     styles={{
                                       root: {
@@ -102,9 +158,9 @@ export default function DashProfile() {
           {
             imageFileUploadError && <Alert color='failure'>{imageFileUploadError}</Alert>
           }
-              <TextInput type='text' id='username' placeholder='Корисничко име' defaultValue={currentUser.username}/>
-              <TextInput type='email' id='email' placeholder='Е-маил' defaultValue={currentUser.email}/>
-              <TextInput type='password' id='password' placeholder='*******'/>
+              <TextInput onChange={handleChange} type='text' id='username' placeholder='Корисничко име' defaultValue={currentUser.username}/>
+              <TextInput onChange={handleChange} type='email' id='email' placeholder='Е-маил' defaultValue={currentUser.email}/>
+              <TextInput onChange={handleChange} type='password' id='password' placeholder='*******'/>
               <Button type='submit' className='bg-gradient-to-r from-white-200 via-gray-500 to-black-500'>
                 Ажурирај кориснички податоци
               </Button>
@@ -113,6 +169,20 @@ export default function DashProfile() {
           <span className='cursor-pointer'>Избриши ја корисничката сметка</span>
           <span className='cursor-pointer'>Одјави се</span>
         </div>
+        {
+          updateUserSuccess && (
+            <Alert color='success' className='mt-5'>
+              {updateUserSuccess}
+            </Alert>
+          )
+        }
+        {
+          updateUserError && (
+            <Alert color='failure' className='mt-5'>
+              {updateUserError}
+            </Alert>
+          )
+        }
       </div>
   )
 }
