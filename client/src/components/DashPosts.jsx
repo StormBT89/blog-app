@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom'
 export default function DashPosts() {
   const { currentUser } = useSelector((state) => state.user);
   const [userPosts, setUserPosts] = useState({});
-  console.log(userPosts);
+  const [showMore, setShowMore] = useState(true);
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -16,6 +16,9 @@ export default function DashPosts() {
         
         if(res.ok){
           setUserPosts(data.posts);
+          if (data.length < 9 ) {
+            setShowMore(false);
+          }
         }
       } catch (error) {
         console.log(error.message);
@@ -27,6 +30,23 @@ export default function DashPosts() {
     }
     
   }, [currentUser._id]);
+
+
+  const handleShowMore = async () => {
+    const startIndex = userPosts.length;
+    try {
+      const res = await fetch(`/api/post/getposts?userId=${currentUser._id}&startIndex=${startIndex}`);
+      const data = await res.json();
+      if (res.ok) {
+        setUserPosts((prev) => [...prev, ...data.posts]);
+        if (data.posts.length < 9) {
+          setShowMore(false);
+        }
+      }
+    } catch (error) {
+      console.log(error);      
+    }
+  }
 
 
   return (
@@ -93,7 +113,14 @@ export default function DashPosts() {
                   </TableBody>
                 ))
               }
-            </Table>            
+            </Table>   
+            { 
+              showMore && (
+                <button onClick={handleShowMore} className='w-full text-orange-600 self-center text-sm py-3'>
+                  Прикажи повеќе
+                </button>
+              )
+            }         
           </>
         ) : (
         <p>Нема креиран состанок од Ваша страна</p>
