@@ -2,7 +2,7 @@ import Post from "../models/post.model.js";
 import { errorHandler } from "../utils/error.js"
 
 export const create = async (req, res, next) => {
-    console.log(req.body.title);
+    
     if (!req.user.isAdmin){
         return next(errorHandler(403, 'Немате привилегии за да креирате состанок.'));
     }
@@ -18,9 +18,6 @@ export const create = async (req, res, next) => {
     .replace(/\s+/g, '-') // replace spaces with hyphens
     .replace(/-+/g, '-')// remove consecutive hyphens
     + new Date().getTime();
-
-    console.log('Слагот');
-    console.log(slug);
 
     const newPost = new Post({
         ...req.body, 
