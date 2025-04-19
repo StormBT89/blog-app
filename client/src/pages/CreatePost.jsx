@@ -4,13 +4,17 @@ import { getDownloadURL, getStorage, ref, uploadBytesResumable } from 'firebase/
 import { app } from '../firebase.js'
 import { CircularProgressbar } from 'react-circular-progressbar'
 import 'react-circular-progressbar/dist/styles.css'
+import {useNavigate} from 'react-router-dom'
 
 export default function CreatePost() {
-
   const [file, setFile] = useState(null);
   const [imageUploadProgress, setImageUploadProgress] = useState(null);
   const [imageUploadError, setImageUploadError] = useState(null);
   const [formData, setFormData] = useState({});
+  const [publishError, setPublishError] = useState(null);
+
+  const navigate = useNavigate();
+  
 
   const handleUploadImage = async () => {
     try {
@@ -50,13 +54,38 @@ export default function CreatePost() {
 
   }
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const res = await fetch('/api/post/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setPublishError(data.message);
+        return;
+      } else {
+        setPublishError(null);
+        navigate(`/post/${data.slug}`);
+      }        
+    } catch (error) {
+      setPublishError('Постојат проблеми со креирањето на состанокот');      
+    }
+  }
+
   return (
     <div className="p-3 max-w-3xl mx-auto min-h-screen">
       <h1 className="text-center text-3xl my=7 font-semibold mb-4">Креирај нов состанок</h1>        
-      <form className="flex flex-col gap-4">
+      <form className="flex flex-col gap-4" onSubmit={handleSubmit} >
         <div className="flex flex-col gap-4 sm:flex-row justify-between">
-          <TextInput type='text' id='title' placeholder='Наслов на состанокот..' required className='flex-1' />
-            <Select>
+          <TextInput type='text' id='title' placeholder='Наслов на состанокот..' required className='flex-1'
+                      onChange={(e) => setFormData({...formData, title: e.target.value})} />
+            <Select onChange={(e) => setFormData({...formData, category: e.target.value})}>
               <option value='kolegijalen'>Колегиум</option>
               <option value='nedelen'>Неделен</option>
               <option value='iten'>Итен</option>
@@ -88,11 +117,14 @@ export default function CreatePost() {
             <img src={formData.image} alt='прикачена фотографија' className='w-full h-72 object-cover'/>
           )
         }
-        <Textarea id='content' placeholder='Инфо за состанок..' required rows={5}>
+        <Textarea onChange={(e) => setFormData({...formData, content: e.target.value})} id='content' placeholder='Инфо за состанок..' required rows={5}>
         </Textarea>
         <Button type='submit' className='bg-gradient-to-r from-white-200 via-gray-500 to-black-500'>
           Поднеси
         </Button>
+        {
+          publishError && <Alert className='mt-5' color='failure'>{publishError}</Alert>
+        }
       </form>         
     </div>
   )
