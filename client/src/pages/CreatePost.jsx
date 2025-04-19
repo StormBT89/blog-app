@@ -21,7 +21,7 @@ export default function CreatePost() {
             Прикачи фотографија
           </Button>
         </div>     
-        <Textarea id='textPost' placeholder='Инфо за состанок..' required rows={5}>
+        <Textarea id='content' placeholder='Инфо за состанок..' required rows={5}>
         </Textarea>
         <Button type='submit' className='bg-gradient-to-r from-white-200 via-gray-500 to-black-500'>
           Поднеси
