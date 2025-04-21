@@ -1,6 +1,6 @@
 import { Sidebar, SidebarItem, SidebarItemGroup, SidebarItems } from 'flowbite-react'
 import { useEffect, useState } from 'react';
-import { HiArrowRight, HiDocumentText, HiUser } from 'react-icons/hi'
+import { HiArrowRight, HiDocumentText, HiOutlineUserGroup, HiUser } from 'react-icons/hi'
 import { Link, useLocation } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { signoutSuccess } from '../redux/user/userSlice.js'
@@ -56,7 +56,16 @@ export default function DashSidebar() {
               </SidebarItem>
             </Link>
             )
-          }         
+          } 
+           {
+            currentUser.isAdmin && (
+              <Link to='/dashboard?tab=users'>
+              <SidebarItem active={tab === 'users'} icon={HiOutlineUserGroup} as='div'>
+                Корисници
+              </SidebarItem>
+            </Link>
+            )
+          }           
           <SidebarItem onClick={handleSignout} icon={HiArrowRight} className='cursor-pointer'>
             Одјави се
           </SidebarItem>
