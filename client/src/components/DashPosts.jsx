@@ -78,7 +78,7 @@ export default function DashPosts() {
       {
         currentUser.isAdmin && userPosts.length > 0 ? (
           <>
-            <Table hoverable className='shadow-md'>
+            <Table hoverable className='text-center shadow-md'>
               <TableHead>
                 <TableHeadCell>
                   Датум на последни измени
@@ -108,7 +108,7 @@ export default function DashPosts() {
                       </TableCell>
                       <TableCell>
                         <Link to={`/post/${post.slug}`}>
-                          <img src={post.image} alt={post.title} className='w-20 h-20 object-cover bg-gray-500'/>
+                          <img src={post.image} alt={post.title} className='w-20 h-20 object-cover bg-gray-500 mx-auto'/>
                         </Link>
                       </TableCell>
                       <TableCell>
