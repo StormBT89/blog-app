@@ -9,7 +9,7 @@ export default function CallToAction() {
             Повеќе информации за проектот
         </h2>
         <p className='text-gray-500 my-2'>
-            Проверете ги достапните информации во врска со проектот
+            Проверете ги сите достапни информации и податоци во врска со проектот
         </p>
         <Link to={'/projects'}>
         <Button className='bg-gradient-to-r from-yellow-200 to-red-500 mx-auto cursor-pointer'>
