@@ -2,6 +2,7 @@ import { errorHandler } from "../utils/error.js";
 import bcryptjs from 'bcryptjs'
 import User from '../models/user.model.js'
 
+
 export const test = (req, res) => {
     res.json({message: 'Тест, тест..'});
 };
@@ -123,4 +124,20 @@ export const getUsers = async (req, res, next) => {
     }
 }
 
+export const getUser = async(req, res, next) => {
+    //console.log(req.params.userId);
+        
+    try {
+        const user = await User.findById(req.params.userId);
+        
+        if (!user) {
+            return next(errorHandler(404, 'Корисничката сметка не е прнајдена'));
+        }
+
+        const { password, ...rest} = user._doc;
+        res.status(200).json(rest);
+    } catch (error) {
+        next(error);
+    }
+}
        

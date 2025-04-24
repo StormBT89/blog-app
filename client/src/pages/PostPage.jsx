@@ -22,7 +22,7 @@ export default function PostPage() {
                     return;
                 }
                 if (res.ok) {
-                    setPost(data.posts[0]);
+                    setPost(data.posts[0]);                    
                     setLoading(false);
                     setError(false);
                 }

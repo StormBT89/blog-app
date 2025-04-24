@@ -1,44 +1,69 @@
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { Button, Textarea, Alert } from 'flowbite-react'
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import Comment from './Comment';
 
     export default function CommentSection({postId}) {
-        const {currentUser} = useSelector((state) => state.user);
-        const [comment, setComment] = useState('');
-        const [commentError, setCommentError] = useState(null);
-        
-        const handleSubmt = async (e) => {
-            e.preventDefault();
+    const {currentUser} = useSelector((state) => state.user);
+    const [comment, setComment] = useState('');
+    const [commentError, setCommentError] = useState(null);
+    const [comments, setComments] = useState([]);
 
-            try {
-                if (comment.length > 500) {
-                    return;
-                }
-        
-                const res = await fetch('/api/comment/create', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
+    console.log(comments); 
+    //console.log(postId);
+
+    const handleSubmt = async (e) => {
+    e.preventDefault();
+
+    if (comment.length > 500) {
+        return;
+      }
+
+    try {                
+        const res = await fetch('/api/comment/create', {
+            method: 'POST',
+            headers: {
+                    'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({
-                        content: comment,
-                        postId,
-                        userId: currentUser._id,
+            body: JSON.stringify({
+                    content: comment,
+                    postId,
+                    userId: currentUser._id,
                     }),
                 });
-        
-                const data = await res.json();
-                if (res.ok) {
-                    setComment('');
-                    setCommentError(null);
+                    
+        const data = await res.json();
+            if (res.ok) {
+                setComment('');
+                setCommentError(null);       
+                setComments([data, ...comments]);         
                 }
-        
-            } catch (error) {
-                setCommentError(error.message);                                
-            }
-
+                
+        } catch (error) {
+            setCommentError(error.message);                                
+        }
     }
+
+    useEffect(() => {
+        const getComments = async () => {
+            try {
+                const res = await fetch(`/api/comment/getPostComments/${postId}`);
+                if (res.ok)
+                {
+                    const data = await res.json();
+                    setComments(data);
+                }
+                
+            } catch (error) {
+                console.log(error.message);
+                
+            }
+        };
+        getComments();
+
+    }, [postId])
+
 
 
   return (
@@ -71,7 +96,7 @@ import { useState } from 'react';
                             value={comment}/>       
                 <div className='flex justify-between items-center mt-5'>
                     <p className='text-gray-500 text-xs'>
-                        Уште {parseInt(500 - comment.length)} карактери Ви преостануваат
+                    Ви преостануваат уште {parseInt(500 - comment.length)} карактери 
                     </p>
                     <Button type='submit' className=''>
                         Поднеси мислење
@@ -85,6 +110,33 @@ import { useState } from 'react';
                 }
               
             </form>
+        )
+      }
+      {
+        comments.length === 0 ? (
+            <p className='text-sm my-5'>
+                Не е започната дискусија за состанокот
+            </p>
+        ) : (
+            <>
+             <div className='text-sm my-5 flex items-center gap-1'>
+                <p>
+                    Доставени мислења
+                </p>
+                <div className='border border-gray-400 py-1 px-2 rounded-sm '>
+                    <p>
+                        {comments.length}
+                    </p>
+                </div>
+            </div>
+            {
+               comments.map((comment) => (
+                    <Comment key={comment._id}
+                             comment={comment}/>
+                ))
+            }
+            </>
+           
         )
       }
     </div>
