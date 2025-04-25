@@ -10,9 +10,14 @@ import Comment from './Comment';
     const [comment, setComment] = useState('');
     const [commentError, setCommentError] = useState(null);
     const [comments, setComments] = useState([]);
+    
     const navigate = useNavigate();
 
-    console.log(comments); 
+    const [modalEditError, setModalEditError] = useState(false);
+
+    
+        
+    //console.log(comment); 
     //console.log(postId);
 
     const handleSubmt = async (e) => {
@@ -89,7 +94,21 @@ import Comment from './Comment';
         } catch (error) {
             console.log(error.message);
             
+        }        
+    }
+
+
+    const handleEdit = async(comment, editedContent ) => {
+        if (currentUser._id === comment.userId) {
+            setComments(
+                comments.map((c) => 
+                (c._id === comment._id ) ? {...c, content: editedContent} : c )
+            )
+        } else {
+            setModalEditError(true);
+            console.log('Немате пристап за промена на мислење');
         }
+        
         
     }
 
@@ -160,13 +179,16 @@ import Comment from './Comment';
                comments.map((comment) => (
                     <Comment key={comment._id}
                              comment={comment}
-                             onLike={handleLike}/>
+                             onLike={handleLike}
+                             onEdit={handleEdit}/>
                 ))
             }
             </>
            
         )
       }
+
+       
     </div>
   )
 }
