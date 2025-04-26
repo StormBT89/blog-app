@@ -3,23 +3,22 @@ import { useSelector } from 'react-redux'
 import { Table, TableBody, TableCell, TableHead, TableHeadCell, TableRow, Modal, ModalBody, ModalHeader, Button } from 'flowbite-react'
 import { HiOutlineExclamationCircle } from 'react-icons/hi'
 
-
-export default function DashUsers() {
+export default function DashComments() {
   const { currentUser } = useSelector((state) => state.user);
-  const [users, setUsers] = useState([]);
+  const [comments, setComments] = useState([]);
   const [showMore, setShowMore] = useState(true);
   const [showModal, setShowModal] = useState(false);
-  const [userIdToDelete, setUserIdToDelete] = useState('');
+  const [commentIdToDelete, setCommentIdToDelete] = useState('');
 
   useEffect(() => {
-    const fetchUsers = async () => {
+    const fetchComments = async () => {
       try {
-        const res = await fetch(`/api/user/getusers`);
+        const res = await fetch(`/api/comment/getcomments`);
         const data = await res.json();
         
         if(res.ok){
-          setUsers(data.users);
-          if (data.users.length < 9 ) {
+          setComments(data.comments);
+          if (data.comments.length < 9 ) {
             setShowMore(false);
           }
         }
@@ -29,20 +28,20 @@ export default function DashUsers() {
     }
 
     if (currentUser.isAdmin) {
-      fetchUsers();
+      fetchComments();
     }
     
   }, [currentUser._id]);
 
 
   const handleShowMore = async () => {
-    const startIndex = users.length;
+    const startIndex = comments.length;
     try {
-      const res = await fetch(`/api/user/getusers?startIndex=${startIndex}`);
+      const res = await fetch(`/api/comment/getcomments?startIndex=${startIndex}`);
       const data = await res.json();
       if (res.ok) {
-        setUsers((prev) => [...prev, ...data.users]);
-        if (data.users.length < 9) {
+        setComments((prev) => [...prev, ...data.comments]);
+        if (data.comments.length < 9) {
           setShowMore(false);
         }
       }
@@ -51,14 +50,15 @@ export default function DashUsers() {
     }
   }
 
-  const handleDeleteUser = async () => {
+  const handleDeleteComment = async () => {
+    setShowModal(false);
     try {
-      const res = await fetch(`/api/user/delete/${userIdToDelete}`, {
+      const res = await fetch(`/api/comment/deleteComment/${commentIdToDelete}`, {
         method: 'DELETE',
       });
       const data = await res.json();
       if (res.ok) {
-        setUsers((prev) => prev.filter((user) => user._id !== userIdToDelete));
+        setComments((prev) => prev.filter((comment) => comment._id !== commentIdToDelete));
         setShowModal(false);
       } else {
         console.log(data.message);
@@ -72,52 +72,52 @@ export default function DashUsers() {
   return (
     <div className='table-auto overflow-x-scroll md:mx-auto p-3'>      
       {
-        currentUser.isAdmin && users.length > 0 ? (
+        currentUser.isAdmin && comments.length > 0 ? (
           <>
             <Table hoverable className='text-center shadow-md'>
               <TableHead>
                 <TableHeadCell>
-                  Датум на креирање на корисник
+                  Датум на последна измена
                 </TableHeadCell>
                 <TableHeadCell>
-                  Фотографија на корисник
+                  Содржина на мислење
                 </TableHeadCell>
                 <TableHeadCell>
-                  Корисничко име
+                  Број на согласности
                 </TableHeadCell>
                 <TableHeadCell>
-                  Е-маил на корисник
+                  Број на состанок
                 </TableHeadCell>
                 <TableHeadCell>
-                  Профил на корисник
+                  Подносител на мислење
                 </TableHeadCell>                
                 <TableHeadCell>
-                  Избриши корисник
+                  Избриши мислење
                 </TableHeadCell>
               </TableHead>
               {
-                users.map((user) => (
-                  <TableBody className='divide-y' key={user._id}>
+                comments.map((comment) => (
+                  <TableBody className='divide-y' key={comment._id}>
                     <TableRow className='bg-white dark:border-gray-700 dark:bg-gray-800'>
                       <TableCell>
-                        {new Date(user.createdAt).toLocaleDateString()}
+                        {new Date(comment.updatedAt).toLocaleDateString()}
+                      </TableCell>                     
+                      <TableCell>                        
+                          {comment.content}                        
                       </TableCell>
                       <TableCell>                        
-                          <img src={user.profilePicture} alt={user.username} className='w-10 h-10 mx-auto rounded-full object-cover bg-gray-500'/>                        
+                          {comment.numberOfLikes}                        
                       </TableCell>
                       <TableCell>                        
-                          {user.username}                        
-                      </TableCell>
+                          {comment.postId}                        
+                      </TableCell>   
                       <TableCell>                        
-                          {user.email}                        
-                      </TableCell>
-                      <TableCell>                        
-                          {user.isAdmin ? 'Раководител': 'Оператор'}                        
-                      </TableCell>                
+                          {comment.userId}                        
+                      </TableCell>                                      
                       <TableCell>
                         <span onClick={() => {
                           setShowModal(true);
-                          setUserIdToDelete(user._id);
+                          setCommentIdToDelete(comment._id);
                         }} className='font-medium text-red-500 hover:underline cursor-pointer'>
                           Избриши
                         </span>
@@ -128,7 +128,7 @@ export default function DashUsers() {
               }
             </Table>   
             { 
-              showMore && users.length > 8 && (
+              showMore && comments.length > 8 && (
                 <button onClick={handleShowMore} className='w-full text-orange-600 self-center text-sm py-3'>
                   Прикажи повеќе
                 </button>
@@ -136,7 +136,7 @@ export default function DashUsers() {
             }         
           </>
         ) : (
-        <p>Не постои корисник</p>
+        <p>Доскусијата сеуште не е започната</p>
         )
       }
         <Modal show={showModal} onClose={()=> setShowModal(false)} popup size='md'>
@@ -145,9 +145,9 @@ export default function DashUsers() {
                 <div className='text-center'>          
                     <HiOutlineExclamationCircle className='h-10 w-10
                      text-gray-400 dark:text-gray-200 mb-4 mx-auto'/>
-                     <h3 className='mb-5 text-lg text-gray-500 dark:text-gray-400'>Дали сте сигурни дека сакате да го избришете избраниот корисник? </h3>
+                     <h3 className='mb-5 text-lg text-gray-500 dark:text-gray-400'>Дали сте сигурни дека сакате да го избришете избраното мислење? </h3>
                      <div className='flex justify-center gap-4'>                
-                      <Button color='red' onClick={handleDeleteUser}>
+                      <Button color='red' onClick={handleDeleteComment}>
                         Да, сигурни сме
                       </Button>
                       <Button color='gray' onClick={() => setShowModal(false)}>
