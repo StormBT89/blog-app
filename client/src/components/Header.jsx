@@ -1,25 +1,39 @@
+import { useEffect, useState } from 'react'
 import { Avatar, Button, Dropdown, DropdownDivider, DropdownHeader, DropdownItem, Navbar, NavbarCollapse, NavbarLink, NavbarToggle, TextInput} from 'flowbite-react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { AiOutlineSearch } from 'react-icons/ai'
 import { FaMoon, FaSun } from 'react-icons/fa'
 import { useSelector, useDispatch } from 'react-redux'
 import { toogleTheme } from '../redux/theme/themeSlice.js'
 import { signoutSuccess } from '../redux/user/userSlice.js'
 
+
 export default function Header() {
-    const path = useLocation().pathname;   
+    const path = useLocation().pathname;     
+    const location = useLocation();  
+    const navigate = useNavigate();
     const dispatch = useDispatch(); 
     const { currentUser } = useSelector((state) => state.user);
     const { lux } = useSelector((state) => state.theme);
+    const [searchTerm, setSearchTerm] = useState('');    
     
+    useEffect(() => {
+      const urlParams = new URLSearchParams(location.search);
+      const searchTermFromUrl = urlParams.get('searchTerm');
+      if (searchTermFromUrl) {
+        setSearchTerm(searchTermFromUrl);
+      }
+
+    }, [location.search]);  
+
+      
     const handleSignout = async () => {
         try {
           const res = await fetch('/api/user/signout', {
             method: 'POST',
           });      
           const data = await res.json();
-          if (!res.ok) {
-            console.log(data.message);
+          if (!res.ok) {            
           } else {
             dispatch(signoutSuccess());
           }
@@ -28,6 +42,15 @@ export default function Header() {
           
         }
       }
+
+    const handleSubmit = (e) => {
+      e.preventDefault();
+
+      const urlParams = new URLSearchParams(location.search);
+      urlParams.set('searchTerm', searchTerm);
+      const searchQuery = urlParams.toString();
+      navigate(`/search?${searchQuery}`);
+    }
     
   return (
    <Navbar className='border-b-2'>
@@ -36,12 +59,14 @@ export default function Header() {
             rounded-lg text-white'>Brain</span>
             Storming 
       </Link>
-      <form>
+      <form onSubmit={handleSubmit}>
         <TextInput
             type='text'
             placeholder='Пронајди ..'
             rightIcon={AiOutlineSearch}
             className='hidden lg:inline'
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
         />
       </form> 
       <Button className='w-12 h-10 lg:hidden' color='gray' pill>
